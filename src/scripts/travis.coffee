@@ -1,12 +1,12 @@
 # Description:
-#   Find the build status of an open-source project on Travis
+#   Find the build status of an open-source project on Travis, defaults to HUBOT_TRAVIS_REPO if none provided
 #   Can also notify about builds, just enable the webhook notification on travis http://about.travis-ci.org/docs/user/build-configuration/ -> 'Webhook notification'
 #
 # Dependencies:
 #   "gitio": "1.0.1"
 #
 # Configuration:
-#   None
+#   HUBOT_TRAVIS_REPO
 #
 # Commands:
 #   hubot travis me <user>/<repo> - Returns the build status of https://github.com/<user>/<repo>
@@ -18,6 +18,7 @@
 #   sferik
 #   nesQuick
 #   sergeylukin
+#   Aaron1011
 
 url = require('url')
 querystring = require('querystring')
@@ -26,7 +27,8 @@ gitio = require('gitio')
 module.exports = (robot) ->
   
   robot.respond /travis me (.*)/i, (msg) ->
-    project = escape(msg.match[1])
+    project = process.env.HUBOT_TRAVIS_REPO or escape(msg.match[1])
+    msg.send project
     msg.http("https://api.travis-ci.org/repos/#{project}")
       .get() (err, res, body) ->
         response = JSON.parse(body)
